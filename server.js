@@ -1,5 +1,4 @@
 const http = require('http');
-const https = require('https');
 const
 {
 	URL
@@ -10,17 +9,6 @@ const gm = require('gm').subClass(
 	imageMagick: true
 });
 
-const bucketName = process.env.BUCKET_NAME || 'assets.cytoid.io';
-
-function requestURLForPath(url)
-{
-	let path = url.pathname;
-	if (path.startsWith('/'))
-	{
-		path = path.substr(1);
-	}
-	return `https://www.googleapis.com/storage/v1/b/${bucketName}/o/${encodeURIComponent(path)}?alt=media`;
-}
 
 function requestListener(req, res)
 {
@@ -32,8 +20,13 @@ function requestListener(req, res)
 		res.end('Method not allowed');
 	}
 	const url = new URL(req.url, 'https://images.cytoid.io');
-	const request = https.get(requestURLForPath(url), (response) =>
-	{
+	const request = http.get({
+		host: 'c.storage.googleapis.com',
+		path: url.pathname,
+		headers: {
+			'Host': 'assets.cytoid.io',
+		}
+	}, (response) => {
 		if (response.statusCode === 200)
 		{
 			// Image exists.
