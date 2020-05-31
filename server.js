@@ -17,7 +17,7 @@ function requestURLForPath(url)
 	let path = url.pathname;
 	if (path.startsWith('/'))
 	{
-		path = path.substr(1)
+		path = path.substr(1);
 	}
 	return `https://www.googleapis.com/storage/v1/b/${bucketName}/o/${encodeURIComponent(path)}?alt=media`;
 }
@@ -35,7 +35,21 @@ function requestListener(req, res)
 		if (response.statusCode === 200)
 		{
 			// Image exists.
-			res.writeHead(200);
+			const contentType = response.headers['content-type'];
+			res.setHeader('content-type', contentType);
+			if (!contentType.startsWith('image/')) {
+				res.writeHead(response.statusCode);
+				response.pipe(res);
+				return;
+			}
+
+			// Copy headers
+			for (const headerName of ['expires', 'etag', 'content-disposition', 'date', 'vary']) {
+				const header = response.headers[headerName];
+				if (header)
+					res.setHeader(headerName, header);
+			}
+			res.setHeader('cache-control', 'max-age=3153600,public');
 
 
 			let height = url.searchParams.get('h');
@@ -43,6 +57,7 @@ function requestListener(req, res)
 			let width = url.searchParams.get('w');
 			if (width) width = parseInt(width) || null;
 
+			res.writeHead(response.statusCode);
 
 			if (height && width)
 			{
@@ -67,6 +82,11 @@ function requestListener(req, res)
 		else
 		{
 			// Error
+			for (const headerName of ['content-type', 'expires', 'etag', 'content-disposition', 'date', 'vary']) {
+				const header = response.headers[headerName];
+				if (header)
+					res.setHeader(headerName, header);
+			}
 			res.writeHead(response.statusCode);
 			response.pipe(res);
 		}
