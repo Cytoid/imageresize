@@ -24,6 +24,8 @@ function requestURLForPath(url)
 
 function requestListener(req, res)
 {
+
+	res.setHeader('X-Powered-By', 'cytoid');
 	if (req.method !== 'GET')
 	{
 		res.writeHead(405);
