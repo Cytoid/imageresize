@@ -10,7 +10,7 @@ const gm = require('gm').subClass(
 	imageMagick: true
 });
 
-const bucketName = 'assets.cytoid.io';
+const bucketName = process.env.BUCKET_NAME || 'assets.cytoid.io';
 
 function requestURLForPath(url)
 {

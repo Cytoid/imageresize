@@ -1,0 +1,12 @@
+runtime: nodejs12
+service: image
+instance_class: F1
+
+env_variables:
+  BUCKET_NAME: "assets.cytoid.io"
+
+handlers:
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto
