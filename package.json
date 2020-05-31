@@ -1,0 +1,6 @@
+{
+  "name": "imageresize",
+  "dependencies": {
+    "gm": "^1.23.1"
+  }
+}
