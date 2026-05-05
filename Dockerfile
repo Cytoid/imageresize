@@ -1,14 +1,12 @@
-FROM node:14-alpine
+FROM oven/bun:alpine
 WORKDIR /usr/src/app
-RUN apk update && apk add --no-cache imagemagick
 
 COPY . .
 
-RUN yarn install \
+RUN bun install \
   --production \
-  --non-interactive \
   --frozen-lockfile
 
 EXPOSE 8040
 
-CMD [ "node", "server.js" ]
+CMD [ "bun", "server.js" ]

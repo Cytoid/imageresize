@@ -1,19 +1,17 @@
-const http = require("http");
-const https = require("https");
-const { URL } = require("url");
-
-const gm = require("gm").subClass({
-  imageMagick: true,
-});
+import http from "node:http";
+import https from "node:https";
+import { URL } from "node:url";
+import sharp from "sharp";
 
 const bucketName = process.env.BUCKET_NAME || "assets.cytoid.io";
+const selfHost = process.env.SELF_HOST || "images.cytoid.io";
 
 function requestURLForPath(url) {
   let path = url.pathname;
   if (path.startsWith("/")) {
     path = path.substr(1);
   }
-  return `https://assets.cytoid.io/` + path;
+  return `https://${bucketName}/` + path;
 }
 
 function requestListener(req, res) {
@@ -22,7 +20,7 @@ function requestListener(req, res) {
     res.writeHead(405);
     res.end("Method not allowed");
   }
-  const url = new URL(req.url, "https://images.cytoid.io");
+  const url = new URL(req.url, `https://${selfHost}`);
   const request = https.get(
     requestURLForPath(url),
     {
@@ -62,14 +60,13 @@ function requestListener(req, res) {
         res.writeHead(response.statusCode);
 
         if (height && width) {
-          gm(response)
-            .resize(width, height, "^")
-            .gravity("Center")
-            .crop(width, height)
-            .stream()
+          response
+            .pipe(sharp().resize(width, height, { fit: "cover" }))
             .pipe(res);
         } else if (height || width) {
-          gm(response).resize(width, height).stream().pipe(res);
+          response
+            .pipe(sharp().resize(width, height))
+            .pipe(res);
         } else {
           response.pipe(res);
         }

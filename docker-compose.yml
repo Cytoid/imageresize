@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  imageresize:
+    build: .
+    ports:
+      - "8040:8040"
+    environment:
+      BUCKET_NAME: "${BUCKET_NAME:-assets.cytoid.io}"
+      SELF_HOST: "${SELF_HOST:-images.cytoid.io}"
+      PORT: "${PORT:-8040}"
+    restart: unless-stopped

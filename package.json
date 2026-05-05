@@ -1,6 +1,7 @@
 {
   "name": "imageresize",
+  "type": "module",
   "dependencies": {
-    "gm": "^1.23.1"
+    "sharp": "^0.34.5"
   }
 }
